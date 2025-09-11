@@ -1,236 +1,58 @@
-# Go Boilerplate Backend
+# My Gin Boilerplate with RBAC
 
-A production-ready Go backend service built with Echo framework, featuring clean architecture, comprehensive middleware, and modern DevOps practices.
+Production-ready Gin boilerplate with RBAC, JWT, GORM (MySQL), and scalable APIs.
 
-## Architecture Overview
+## Setup
+1. Start MySQL: `docker run -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root mysql:8`
+2. Copy `.env.example` to `.env` and fill values.
+3. Install deps: `go mod tidy`.
+4. Generate TLS certs: `openssl req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out cert.pem -keyout key.pem`.
+5. Run: `go run ./cmd/server/main.go` (dev) or `docker build -t gin-app . && docker run -p 8080:8080 gin-app` (prod).
 
-This backend follows clean architecture principles with clear separation of concerns:
+## Structure
+- cmd/server: Entry point.
+- internal/config: Env/config.
+- internal/database: GORM/MySQL setup and migrations.
+- internal/errs: Custom errors.
+- internal/handler: Auth and user APIs.
+- internal/lib: JWT and token store.
+- internal/logger: Structured logging.
+- internal/middleware: Auth, logging, timeout.
+- internal/model: User and role models.
+- internal/router: Route definitions.
+- internal/service: Auth and user logic.
+- internal/validation: Custom validators.
+- static/: Static files.
 
-```
-backend/
-├── cmd/go-boilerplate/        # Application entry point
-├── internal/                  # Private application code
-│   ├── config/               # Configuration management
-│   ├── database/             # Database connections and migrations
-│   ├── handler/              # HTTP request handlers
-│   ├── service/              # Business logic layer
-│   ├── repository/           # Data access layer
-│   ├── model/                # Domain models
-│   ├── middleware/           # HTTP middleware
-│   ├── lib/                  # Shared libraries
-│   └── validation/           # Request validation
-├── static/                   # Static files (OpenAPI spec)
-├── templates/                # Email templates
-└── Taskfile.yml              # Task automation
-```
+## APIs
+- POST /register: Register user.
+- POST /login: Login, returns access/refresh tokens.
+- POST /refresh: Refresh access token.
+- POST /logout: Blacklist refresh token.
+- GET /api/profile: Get user profile (JWT).
+- PUT /api/profile: Update profile (JWT).
+- DELETE /api/profile: Delete profile (JWT).
+- GET /api/admin/users: List users (admin).
+- POST /api/admin/users: Create user (admin).
+- PUT /api/admin/users/:id: Update user (admin).
+- DELETE /api/admin/users/:id: Delete user (admin).
+- GET /health: Health check.
+- GET /static/*: Static files.
 
-## Features
+## Best Practices
+- HTTPS, secure headers (CSP, X-Frame-Options).
+- JWT with RBAC (user/admin roles).
+- Rate limiting (10 req/s), CORS, timeouts (5s).
+- Password hashing (bcrypt).
+- Structured logging (logrus).
+- GORM with MySQL connection pooling.
+- Token blacklisting (in-memory, Redis-ready).
+- Graceful shutdown.
+- Dockerized deployment.
 
-### Core Framework
-- **Echo v4**: High-performance, minimalist web framework
-- **Clean Architecture**: Handlers → Services → Repositories → Models
-- **Dependency Injection**: Constructor-based DI for testability
-
-### Database
-- **PostgreSQL**: Primary database with pgx/v5 driver
-- **Migration System**: Tern for schema versioning
-- **Connection Pooling**: Optimized for production workloads
-- **Transaction Support**: ACID compliance for critical operations
-
-### Authentication & Security
-- **Clerk Integration**: Modern authentication service
-- **JWT Validation**: Secure token verification
-- **Role-Based Access**: Configurable permission system
-- **Rate Limiting**: 20 requests/second per IP
-- **Security Headers**: XSS, CSRF, and clickjacking protection
-
-### Observability
-- **New Relic APM**: Application performance monitoring
-- **Structured Logging**: JSON logs with Zerolog
-- **Request Tracing**: Distributed tracing support
-- **Health Checks**: Readiness and liveness endpoints
-- **Custom Metrics**: Business-specific monitoring
-
-### Background Jobs
-- **Asynq**: Redis-based distributed task queue
-- **Priority Queues**: Critical, default, and low priority
-- **Job Scheduling**: Cron-like task scheduling
-- **Retry Logic**: Exponential backoff for failed jobs
-- **Job Monitoring**: Real-time job status tracking
-
-### Email Service
-- **Resend Integration**: Reliable email delivery
-- **HTML Templates**: Beautiful transactional emails
-- **Preview Mode**: Test emails in development
-- **Batch Sending**: Efficient bulk operations
-
-### API Documentation
-- **OpenAPI 3.0**: Complete API specification
-- **Swagger UI**: Interactive API explorer
-- **Auto-generation**: Code-first approach
-
-## Getting Started
-
-### Prerequisites
-- Go 1.24+
-- PostgreSQL 16+
-- Redis 8+
-- Task (taskfile.dev)
-
-### Installation
-
-1. Install dependencies:
-```bash
-go mod download
-```
-
-2. Set up environment:
-```bash
-cp .env.example .env
-# Configure your environment variables
-```
-
-3. Run migrations:
-```bash
-task migrations:up
-```
-
-4. Start the server:
-```bash
-task run
-```
-
-## Configuration
-
-Configuration is managed through environment variables with the `BOILERPLATE_` prefix:
-
-## Development
-
-### Available Tasks
-
-```bash
-task help                    # Show all available tasks
-task run                     # Run the application
-task test                    # Run tests
-task migrations:new name=X   # Create new migration
-task migrations:up           # Apply migrations
-task migrations:down         # Rollback last migration
-task tidy                    # Format and tidy dependencies
-```
-
-### Project Structure
-
-#### Handlers (`internal/handler/`)
-HTTP request handlers that:
-- Parse and validate requests
-- Call appropriate services
-- Format responses
-- Handle HTTP-specific concerns
-
-#### Services (`internal/service/`)
-Business logic layer that:
-- Implements use cases
-- Orchestrates operations
-- Enforces business rules
-- Handles transactions
-
-#### Repositories (`internal/repository/`)
-Data access layer that:
-- Encapsulates database queries
-- Provides data mapping
-- Handles database-specific logic
-- Supports multiple data sources
-
-#### Models (`internal/model/`)
-Domain entities that:
-- Define core business objects
-- Include validation rules
-- Remain database-agnostic
-
-#### Middleware (`internal/middleware/`)
-Cross-cutting concerns:
-- Authentication/Authorization
-- Request logging
-- Error handling
-- Rate limiting
-- CORS
-- Security headers
-
-### Testing
-
-#### Unit Tests
-```bash
-go test ./...
-```
-
-## Logging
-
-Structured logging with Zerolog:
-
-```go
-log.Info().
-    Str("user_id", userID).
-    Str("action", "login").
-    Msg("User logged in successfully")
-```
-
-Log levels:
-- `debug`: Detailed debugging information
-- `info`: General informational messages
-- `warn`: Warning messages
-- `error`: Error messages
-- `fatal`: Fatal errors that cause shutdown
-
-### Production Checklist
-
-- [ ] Set production environment variables
-- [ ] Enable SSL/TLS
-- [ ] Configure production database
-- [ ] Set up monitoring alerts
-- [ ] Configure log aggregation
-- [ ] Enable rate limiting
-- [ ] Set up backup strategy
-- [ ] Configure auto-scaling
-- [ ] Implement graceful shutdown
-- [ ] Set up CI/CD pipeline
-
-## Performance Optimization
-
-### Database
-- Connection pooling configured
-- Prepared statements for frequent queries
-- Indexes on commonly queried fields
-- Query optimization with EXPLAIN ANALYZE
-
-### Caching
-- Redis for session storage
-- In-memory caching for hot data
-- HTTP caching headers
-
-### Concurrency
-- Goroutine pools for parallel processing
-- Context-based cancellation
-- Proper mutex usage
-
-## Security Best Practices
-
-1. **Input Validation**: All inputs validated and sanitized
-2. **SQL Injection**: Parameterized queries only
-3. **XSS Protection**: Output encoding and CSP headers
-4. **CSRF Protection**: Token-based protection
-5. **Rate Limiting**: Per-IP and per-user limits
-6. **Secrets Management**: Environment variables, never in code
-7. **HTTPS Only**: Enforce TLS in production
-8. **Dependency Scanning**: Regular vulnerability checks
-
-## Contributing
-
-1. Follow Go best practices and idioms
-2. Write tests for new features
-3. Update documentation
-4. Run linters before committing
-5. Keep commits atomic and well-described
-
-## License
-
-See the parent project's LICENSE file.
+## Next Steps
+- Enable Redis for token blacklisting.
+- Add tests (unit, integration).
+- Setup CI/CD (GitHub Actions).
+- Integrate Prometheus/Grafana.
+- Scan with Trivy for security.
