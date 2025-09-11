@@ -21,7 +21,7 @@ tasks:
   run:
     desc: run the cmd application
     cmds:
-    - go run ./cmd
+    - go run ./cmd/server
 
   migrations:new:
     desc: create a new database migration
