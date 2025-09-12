@@ -1,3 +1,25 @@
+// Gin Auth API
+// @title Gin Authentication API
+// @version 1.0
+// @description A production-ready authentication API built with Gin framework, featuring JWT authentication, RBAC, and comprehensive user management
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name MIT
+// @license.url https://opensource.org/licenses/MIT
+
+// @host localhost:8080
+// @BasePath /
+// @schemes http https
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
+
 package main
 
 import (
@@ -24,6 +46,8 @@ import (
 	mgin "github.com/ulule/limiter/v3/drivers/middleware/gin"
 	"github.com/ulule/limiter/v3/drivers/store/memory"
 	mredis "github.com/ulule/limiter/v3/drivers/store/redis"
+	
+	_ "github.com/shahariaz/gin-auth-service/docs" // Import generated docs
 )
 
 func main() {
@@ -115,6 +139,12 @@ func main() {
 	r.StaticFile("/favicon.ico", "./static/favicon.ico")
 
 	// Health check
+	// @Summary Health check
+	// @Description Check if the API is running and healthy
+	// @Tags System
+	// @Produce json
+	// @Success 200 {object} map[string]interface{} "API is healthy"
+	// @Router /health [get]
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "healthy", "version": cfg.AppVersion})
 	})
