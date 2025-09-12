@@ -53,3 +53,18 @@ tasks:
     - go mod tidy
     - echo 'Verifying dependencies...'
     - go mod verify
+
+  docs:
+    desc: generate swagger/openapi documentation
+    cmds:
+    - echo 'Generating API documentation...'
+    - swag init -g cmd/server/main.go
+    - echo 'Documentation generated in docs/ directory'
+    - echo 'Access at http://localhost:8080/swagger/index.html when running in development mode'
+
+  dev:
+    desc: run the application in development mode with live documentation
+    deps: [docs]
+    cmds:
+    - echo 'Starting development server with Swagger docs...'
+    - go run ./cmd/server --env=development
