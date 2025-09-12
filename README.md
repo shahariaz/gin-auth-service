@@ -2,12 +2,49 @@
 
 Production-ready Gin boilerplate with RBAC, JWT, GORM (MySQL), and scalable APIs.
 
+## Features
+
+- **Authentication & Authorization**: JWT with Role-Based Access Control (RBAC)
+- **API Documentation**: Interactive Swagger/OpenAPI documentation
+- **Database**: GORM with MySQL, connection pooling, and migrations
+- **Security**: Password hashing (bcrypt), rate limiting, CORS, secure headers
+- **Logging**: Structured logging with logrus
+- **Middleware**: Authentication, error handling, timeout, logging
+- **Deployment**: Docker containerization with multi-stage builds
+- **Development**: Hot reload, comprehensive linting, graceful shutdown
+
+## API Documentation
+
+Interactive Swagger documentation is available when running in development mode:
+
+```
+http://localhost:8080/swagger/index.html
+```
+
+The documentation includes:
+- All API endpoints with request/response schemas
+- Authentication examples
+- Interactive testing interface
+- Model definitions
+
 ## Setup
 1. Start MySQL: `docker run -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root mysql:8`
 2. Copy `.env.example` to `.env` and fill values.
 3. Install deps: `go mod tidy`.
 4. Generate TLS certs: `openssl req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out cert.pem -keyout key.pem`.
 5. Run: `go run ./cmd/server/main.go` (dev) or `docker build -t gin-app . && docker run -p 8080:8080 gin-app` (prod).
+
+## Documentation Development
+
+To regenerate API documentation after making changes:
+
+```bash
+# Install swag if not already installed
+go install github.com/swaggo/swag/cmd/swag@latest
+
+# Generate documentation
+swag init -g cmd/server/main.go
+```
 
 ## Structure
 - cmd/server: Entry point.
