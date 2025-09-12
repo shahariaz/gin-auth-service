@@ -19,6 +19,16 @@ func NewAuthHandler(svc *service.AuthService, log *logrus.Logger) *AuthHandler {
 	return &AuthHandler{service: svc, log: log}
 }
 
+// Register godoc
+// @Summary Register a new user
+// @Description Register a new user account with username, email and password
+// @Tags Authentication
+// @Accept json
+// @Produce json
+// @Param request body model.RegisterRequest true "Registration request"
+// @Success 201 {object} map[string]string "User registered successfully"
+// @Failure 400 {object} map[string]string "Bad request - validation error or user already exists"
+// @Router /register [post]
 func (h *AuthHandler) Register(c *gin.Context) {
 	var input struct {
 		Username string `json:"username" binding:"required,min=3"`
@@ -44,6 +54,17 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "User registered"})
 }
 
+// Login godoc
+// @Summary User login
+// @Description Authenticate user with email and password, returns access and refresh tokens
+// @Tags Authentication
+// @Accept json
+// @Produce json
+// @Param request body model.LoginRequest true "Login request"
+// @Success 200 {object} map[string]interface{} "Login successful with tokens and user info"
+// @Failure 400 {object} map[string]string "Bad request - validation error"
+// @Failure 401 {object} map[string]string "Unauthorized - invalid credentials"
+// @Router /login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
 	var input struct {
 		Email    string `json:"email" binding:"required,email"`
@@ -68,6 +89,17 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	})
 }
 
+// RefreshToken godoc
+// @Summary Refresh access token
+// @Description Generate a new access token using a valid refresh token
+// @Tags Authentication
+// @Accept json
+// @Produce json
+// @Param request body model.RefreshTokenRequest true "Refresh token request"
+// @Success 200 {object} map[string]string "New access token generated"
+// @Failure 400 {object} map[string]string "Bad request - validation error"
+// @Failure 401 {object} map[string]string "Unauthorized - invalid refresh token"
+// @Router /refresh [post]
 func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	var input struct {
 		RefreshToken string `json:"refresh_token" binding:"required"`
@@ -87,6 +119,16 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"access_token": accessToken})
 }
 
+// Logout godoc
+// @Summary User logout
+// @Description Logout user by blacklisting the refresh token
+// @Tags Authentication
+// @Accept json
+// @Produce json
+// @Param request body model.RefreshTokenRequest true "Refresh token to logout"
+// @Success 200 {object} map[string]string "Logout successful"
+// @Failure 400 {object} map[string]string "Bad request - validation error or logout failed"
+// @Router /logout [post]
 func (h *AuthHandler) Logout(c *gin.Context) {
 	var input struct {
 		RefreshToken string `json:"refresh_token" binding:"required"`
