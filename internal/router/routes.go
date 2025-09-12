@@ -10,6 +10,8 @@ import (
 	"github.com/shahariaz/gin-auth-service/internal/service"
 	"github.com/shahariaz/gin-auth-service/internal/validation"
 	"github.com/sirupsen/logrus"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	swaggerFiles "github.com/swaggo/files"
 )
 
 func SetupRoutes(r *gin.Engine, cfg *config.Config, db *database.Database, log *logrus.Logger) {
@@ -26,6 +28,11 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config, db *database.Database, log *
 	r.POST("/login", authHandler.Login)
 	r.POST("/refresh", authHandler.RefreshToken)
 	r.POST("/logout", authHandler.Logout)
+
+	// Swagger documentation (only in development mode)
+	if cfg.GinMode == "debug" || cfg.GinMode != "release" {
+		r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	}
 
 	// Protected routes
 	api := r.Group("/api")
