@@ -13,8 +13,12 @@ import (
 )
 
 func SetupRoutes(r *gin.Engine, cfg *config.Config, db *database.Database, log *logrus.Logger) {
-	// Initialize dependencies
-	tokenStore := lib.NewInMemoryTokenStore() // Switch to RedisTokenStore for prod
+	// Initialize dependencies/ // Switch to RedisTokenStore for prod
+
+	tokenStore, err := lib.NewRedisTokenStore("localhost:6379")
+	if err != nil {
+		log.Fatalf("Failed to connect to Redis: %v", err)
+	}
 	validator := validation.NewValidator()
 	userService := service.NewUserService(db, validator, log)
 	authService := service.NewAuthService(db, validator, tokenStore, cfg.JWT_SECRET, log)

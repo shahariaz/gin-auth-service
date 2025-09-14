@@ -1,7 +1,7 @@
 package lib
 
 import (
-	"sync"
+	"context"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -12,44 +12,42 @@ type TokenStore interface {
 	IsBlacklisted(token string) (bool, error)
 }
 
-type InMemoryTokenStore struct {
-	tokens map[string]time.Time
-	mu     sync.RWMutex
-}
+// type InMemoryTokenStore struct {
+// 	tokens map[string]time.Time
+// 	mu     sync.RWMutex
+// }
 
-func NewInMemoryTokenStore() *InMemoryTokenStore {
-	return &InMemoryTokenStore{
-		tokens: make(map[string]time.Time),
-	}
-}
+// func NewInMemoryTokenStore() *InMemoryTokenStore {
+// 	return &InMemoryTokenStore{
+// 		tokens: make(map[string]time.Time),
+// 	}
+// }
 
-func (s *InMemoryTokenStore) Blacklist(token string, expiry time.Duration) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.tokens[token] = time.Now().Add(expiry)
-	return nil
-}
+// func (s *InMemoryTokenStore) Blacklist(token string, expiry time.Duration) error {
+// 	s.mu.Lock()
+// 	defer s.mu.Unlock()
+// 	s.tokens[token] = time.Now().Add(expiry)
+// 	return nil
+// }
 
-func (s *InMemoryTokenStore) IsBlacklisted(token string) (bool, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	expiry, exists := s.tokens[token]
-	if !exists {
-		return false, nil
-	}
-	if time.Now().After(expiry) {
-		delete(s.tokens, token)
-		return false, nil
-	}
-	return true, nil
-}
+// func (s *InMemoryTokenStore) IsBlacklisted(token string) (bool, error) {
+// 	s.mu.RLock()
+// 	defer s.mu.RUnlock()
+// 	expiry, exists := s.tokens[token]
+// 	if !exists {
+// 		return false, nil
+// 	}
+// 	if time.Now().After(expiry) {
+// 		delete(s.tokens, token)
+// 		return false, nil
+// 	}
+// 	return true, nil
+// }
 
-// RedisTokenStore (stub, uncomment to use Redis)
 type RedisTokenStore struct {
 	client *redis.Client
 }
 
-/*
 func NewRedisTokenStore(redisURL string) (*RedisTokenStore, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr: redisURL,
@@ -69,4 +67,3 @@ func (s *RedisTokenStore) IsBlacklisted(token string) (bool, error) {
 	exists, err := s.client.Exists(context.Background(), "blacklist:"+token).Result()
 	return exists == 1, err
 }
-*/

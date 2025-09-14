@@ -13,7 +13,7 @@ type Database struct {
 
 func NewDatabase(dsn string) (*Database, error) {
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		DisableForeignKeyConstraintWhenMigrating: true, // For safety
+		DisableForeignKeyConstraintWhenMigrating: true,
 	})
 	if err != nil {
 		return nil, err
