@@ -46,7 +46,7 @@ import (
 	mgin "github.com/ulule/limiter/v3/drivers/middleware/gin"
 	"github.com/ulule/limiter/v3/drivers/store/memory"
 	mredis "github.com/ulule/limiter/v3/drivers/store/redis"
-	
+
 	_ "github.com/shahariaz/gin-auth-service/docs" // Import generated docs
 )
 
@@ -91,7 +91,7 @@ func main() {
 		MaxAge:           12 * time.Hour,
 	}))
 
-	// Rate limiting with ulule/limiter (Redis for prod, in-memory for dev)
+	// Rate limiting with ulule/limiter
 	var rateStore limiter.Store
 	if cfg.RedisURL != "" {
 		redisClient := redis.NewClient(&redis.Options{Addr: cfg.RedisURL})
@@ -100,7 +100,7 @@ func main() {
 			log.Fatal("Failed to initialize Redis store: ", err)
 		}
 	} else {
-		rateStore = memory.NewStore() // In-memory for dev
+		rateStore = memory.NewStore()
 	}
 	rate, err := limiter.NewRateFromFormatted("10-S") // 10 requests per second
 	if err != nil {

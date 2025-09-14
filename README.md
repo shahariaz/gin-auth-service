@@ -87,9 +87,3 @@ swag init -g cmd/server/main.go
 - Graceful shutdown.
 - Dockerized deployment.
 
-## Next Steps
-- Enable Redis for token blacklisting.
-- Add tests (unit, integration).
-- Setup CI/CD (GitHub Actions).
-- Integrate Prometheus/Grafana.
-- Scan with Trivy for security.

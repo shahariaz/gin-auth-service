@@ -19,7 +19,7 @@ func GenerateAccessToken(userID uint, username, role string, secret []byte) (str
 		Role:     role,
 		UserID:   userID,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * time.Minute)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(60 * time.Minute)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			Issuer:    "my-gin-app",
 			Audience:  []string{"api"},
