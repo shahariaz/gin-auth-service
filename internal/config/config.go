@@ -21,13 +21,22 @@ type Config struct {
 func LoadConfig(env string) *Config { // Changed to return pointer for consistency
 	cfg := &Config{ // Use pointer
 		AppVersion:      "1.0.0",
-		GinMode:         "debug",
+		GinMode:         strings.TrimSpace(os.Getenv("GIN_MODE")), // Read from env
 		Port:            strings.TrimSpace(os.Getenv("PORT")), // Trim whitespace
 		JWT_SECRET:      []byte(os.Getenv("JWT_SECRET")),
 		AllowOrigins:    []string{"http://localhost:3000"},
 		RateLimitPerSec: 10,
 		DB_DSN:          strings.TrimSpace(os.Getenv("DB_DSN")),    // Trim
 		RedisURL:        strings.TrimSpace(os.Getenv("REDIS_URL")), // Trim
+	}
+
+	// Set default GIN_MODE if not provided
+	if cfg.GinMode == "" {
+		if env == "development" {
+			cfg.GinMode = "debug"
+		} else {
+			cfg.GinMode = "release"
+		}
 	}
 
 	if cfg.Port == "" {
